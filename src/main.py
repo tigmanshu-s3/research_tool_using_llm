@@ -17,7 +17,7 @@ def load_text(urls):
 
 def split_text(data):
     text_splitter = RecursiveCharacterTextSplitter(
-        separators=["\n\n", "\n", ".", ","], chunk_size=2000
+        separators=["\n\n", "\n", ".", ","], chunk_size=200
     )
     docs = text_splitter.split_documents(data)
 
