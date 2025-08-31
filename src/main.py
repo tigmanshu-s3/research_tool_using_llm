@@ -2,11 +2,8 @@ from langchain.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from dotenv import load_dotenv
 
 from input_output import save_pickle_file
-
-load_dotenv()
 
 
 def load_text(urls):
@@ -35,12 +32,3 @@ def process_urls(urls):
     docs = split_text(data)
     vectorstore = create_and_save_embeddings_to_db(docs)
     save_pickle_file(vectorstore)
-
-
-# if __name__ == "__main__":
-#     process_urls(
-#         [
-#             "https://www.geeksforgeeks.org/devops/how-to-use-docker-for-machine-learning/",
-#             "https://www.renpy.org/doc/html/quickstart.html",
-#         ]
-#     )

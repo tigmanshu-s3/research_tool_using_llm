@@ -1,10 +1,8 @@
 import os.path
-from langchain_community.llms import HuggingFacePipeline
 import streamlit as st
 from main import process_urls
 from constant import VECTORSTORE_PICKLE_FILEPATH
 from langchain.chains import RetrievalQAWithSourcesChain
-from transformers import pipeline
 from input_output import load_pickle_file
 from langchain_openai import ChatOpenAI
 from dotenv import dotenv_values
@@ -15,16 +13,34 @@ st.title("Research Tool")
 
 st.sidebar.title("Article Research URLs")
 
-urls = []
+# --- Dynamic URL Input Management ---
+if "urls" not in st.session_state:
+    st.session_state.urls = [""]  # start with one empty field
 
-for i in range(1):
-    url = st.sidebar.text_input(f"URL {i+1}")
-    urls.append(url)
 
-processed_url_clicked = st.sidebar.button("Process URL")
+def add_url():
+    st.session_state.urls.append("")
 
+
+def remove_url(index):
+    if len(st.session_state.urls) > 1:  # keep at least one input
+        st.session_state.urls.pop(index)
+
+
+# Render dynamic inputs with remove button
+for i, url in enumerate(st.session_state.urls):
+    cols = st.sidebar.columns([4, 1])
+    st.session_state.urls[i] = cols[0].text_input(f"URL {i+1}", url, key=f"url_{i}")
+    if cols[1].button("➖", key=f"remove_{i}"):
+        remove_url(i)
+
+# Add button
+st.sidebar.button("➕ Add another URL", on_click=add_url)
+
+# Process button
+processed_url_clicked = st.sidebar.button("Process URLs")
 if processed_url_clicked:
-    process_urls(urls)
+    process_urls([u for u in st.session_state.urls if u.strip()])
 
 query = st.text_input("Question")
 
