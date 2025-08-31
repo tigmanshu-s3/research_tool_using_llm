@@ -28,10 +28,6 @@ if processed_url_clicked:
 
 query = st.text_input("Question")
 
-# qa_pipeline = pipeline(
-#     "text-generation", model="google/flan-t5-large", max_new_tokens=512, truncation=True
-# )
-# llm = HuggingFacePipeline(pipeline=qa_pipeline)
 llm = ChatOpenAI(
     model="deepseek/deepseek-chat-v3.1:free",
     base_url="https://openrouter.ai/api/v1",
@@ -45,13 +41,21 @@ if query:
             llm=llm, retriever=vectorstore.as_retriever(search_kwargs={"k": 3})
         )
         result = chain({"question": query}, return_only_outputs=True)
-        st.title("Answer")
-        st.subheader(result["answer"])
+        # Layout
+        st.markdown("## 📌 Results")
+
+        with st.container():
+            st.markdown("### ❓ Question")
+            st.info(query, icon="💬")
+
+        with st.container():
+            st.markdown("### ✅ Answer")
+            st.success(result["answer"], icon="🤖")
 
         sources = result.get("sources", "")
         if sources:
-            st.subheader("Sources")
-            sources_list = sources.split("\n")
-
-            for source in sources_list:
-                st.write(source)
+            with st.container():
+                st.markdown("### 📚 Sources")
+                for idx, source in enumerate(sources.split("\n"), start=1):
+                    if source.strip():
+                        st.write(f"**{idx}.** {source}")
